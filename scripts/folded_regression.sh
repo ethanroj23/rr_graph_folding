@@ -4,6 +4,7 @@
 # 3. runs regression
 
 export FOLDING_METHOD=nodes_all_attr
+export RRGF_DIR=/home/ethan/workspaces/ethanroj23/rr_graph_folding
 
 # month date hour minute
 now=$(date +"%m_%d_%H_%M")
@@ -23,20 +24,13 @@ echo $$ > $CUR_DIR/current_pid.out
 
 export perf_options="sudo perf stat -B -e cache-references,cache-misses,L1-dcache-loads,L1-dcache-load-misses,L1-dcache-stores,LLC-loads,LLC-load-misses,LLC-stores"
 
-# export VTR1_DIR=/home/ethan/vtr_work/quickstart/vpr_tseng
-# export cdvtr1="cd $VTR1_DIR"
-# export perf_vtr1="$perf_options --output $VTR1_DIR/vtr1_perf.out \
-#     $VTR_ROOT/vpr/vpr $VTR_ROOT/vtr_flow/arch/timing/EArch.xml  \
-#     $VTR_ROOT/vtr_flow/benchmarks/blif/tseng.blif \
-#     --route_chan_width 100 --read_rr_graph /home/ethan/rr_graphs/fpt/fptvtr1.xml"
-
 # EArch tseng
 echo "EArch tseng..."
 cd ~/vtr_work/quickstart/vpr_tseng
 $perf_options --output perf.out \
 $VTR_ROOT/vpr/vpr $VTR_ROOT/vtr_flow/arch/timing/EArch.xml $VTR_ROOT/vtr_flow/benchmarks/blif/tseng.blif \
 --route_chan_width 100 --read_rr_graph \
-$VTR_ROOT/vpr/src/route/rr_graph_folding/folded_graphs/nodes_all_attr_EArch_tseng.xml \
+$RRGF_DIR/folded_graphs/nodes_all_attr_EArch_tseng.xml \
 > $CUR_DIR/EArch_tseng.log
 cp perf.out $CUR_DIR/EArch_tseng_perf.out
 
@@ -48,7 +42,7 @@ $perf_options --output perf.out \
 $VTR_ROOT/vpr/vpr k6_frac_N10_frac_chain_mem32K_40nm.xml arm_core \
 --circuit_file arm_core.pre-vpr.blif \
 --route_chan_width 120 --read_rr_graph \
-$VTR_ROOT/vpr/src/route/rr_graph_folding/folded_graphs/nodes_all_attr_k6_frac_N10_frac_chain_mem32K_40nm_arm_core.xml \
+$RRGF_DIR/folded_graphs/nodes_all_attr_k6_frac_N10_frac_chain_mem32K_40nm_arm_core.xml \
 > $CUR_DIR/k6_arm_core.log 
 cp perf.out $CUR_DIR/k6_arm_core_perf.out
 

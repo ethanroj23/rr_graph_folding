@@ -4,6 +4,7 @@
 # 3. runs regression
 
 export FOLDING_METHOD=flat
+export RRGF_DIR=/home/ethan/workspaces/ethanroj23/rr_graph_folding
 
 # month date hour minute
 now=$(date +"%m_%d_%H_%M")
@@ -29,7 +30,7 @@ cd ~/vtr_work/quickstart/vpr_tseng
 $perf_options --output perf.out \
 $VTR_ROOT/vpr/vpr $VTR_ROOT/vtr_flow/arch/timing/EArch.xml $VTR_ROOT/vtr_flow/benchmarks/blif/tseng.blif \
 --route_chan_width 100 --read_rr_graph \
-$VTR_ROOT/vpr/src/route/rr_graph_folding/flat_graphs/EArch_tseng.xml \
+$RRGF_DIR/flat_graphs/EArch_tseng.xml \
 > $CUR_DIR/EArch_tseng.log
 cp perf.out $CUR_DIR/EArch_tseng_perf.out
 
@@ -41,7 +42,7 @@ $perf_options --output perf.out \
 $VTR_ROOT/vpr/vpr k6_frac_N10_frac_chain_mem32K_40nm.xml arm_core \
 --circuit_file arm_core.pre-vpr.blif \
 --route_chan_width 120 --read_rr_graph \
-$VTR_ROOT/vpr/src/route/rr_graph_folding/flat_graphs/k6_frac_N10_frac_chain_mem32K_40nm_arm_core.xml \
+$RRGF_DIR/flat_graphs/k6_frac_N10_frac_chain_mem32K_40nm_arm_core.xml \
 > $CUR_DIR/k6_arm_core.log 
 cp perf.out $CUR_DIR/k6_arm_core_perf.out
 
@@ -55,7 +56,7 @@ cp perf.out $CUR_DIR/k6_arm_core_perf.out
 #    --route_chan_width 300 \
 #    --max_router_iterations 400 \
 #    --router_lookahead map \
-#    --read_rr_graph $VTR_ROOT/vpr/src/route/rr_graph_folding/folded_graphs/nodes_all_attr_stratixiv_cholesky.xml \
+#    --read_rr_graph $RRGF_DIR/flat_graphs/stratixiv_cholesky.xml \
 #    >> $CUR_DIR/stratixiv_cholesky.log
 # cp perf.out $CUR_DIR/stratixiv_cholesky_perf.out
 
