@@ -46,19 +46,21 @@ $RRGF_DIR/flat_graphs/k6_frac_N10_frac_chain_mem32K_40nm_arm_core.xml \
 > $CUR_DIR/k6_arm_core.log 
 cp perf.out $CUR_DIR/k6_arm_core_perf.out
 
-# # stratixiv cholesky
-# cd $VTR_ROOT/vtr_flow/tasks/regression_tests/vtr_reg_weekly/vtr_reg_titan/run003/stratixiv_arch.timing.xml/cholesky_mc_stratixiv_arch_timing.blif/common
-# $perf_options --output perf.out \
-# $VTR_ROOT/vpr/vpr stratixiv_arch.timing.xml \
-#    cholesky_mc_stratixiv_arch_timing \
-#    --circuit_file \
-#    cholesky_mc_stratixiv_arch_timing.pre-vpr.blif \
-#    --route_chan_width 300 \
-#    --max_router_iterations 400 \
-#    --router_lookahead map \
-#    --read_rr_graph $RRGF_DIR/flat_graphs/stratixiv_cholesky.xml \
-#    >> $CUR_DIR/stratixiv_cholesky.log
-# cp perf.out $CUR_DIR/stratixiv_cholesky_perf.out
+# stratixiv cholesky
+echo "stratixiv cholesky..."
+
+cd $VTR_ROOT/vtr_flow/tasks/regression_tests/vtr_reg_weekly/vtr_reg_titan/run003/stratixiv_arch.timing.xml/cholesky_mc_stratixiv_arch_timing.blif/common
+$perf_options --output perf.out \
+$VTR_ROOT/vpr/vpr stratixiv_arch.timing.xml \
+   cholesky_mc_stratixiv_arch_timing \
+   --circuit_file \
+   cholesky_mc_stratixiv_arch_timing.pre-vpr.blif \
+   --route_chan_width 300 \
+   --max_router_iterations 400 \
+   --router_lookahead map \
+   --read_rr_graph $RRGF_DIR/flat_graphs/stratixiv_cholesky.xml \
+   >> $CUR_DIR/stratixiv_cholesky.log
+cp perf.out $CUR_DIR/stratixiv_cholesky_perf.out
 
 
 # mv /home/ethan/vtr_regressions/nohup.out /home/ethan/vtr_regressions/$dir_name/nohup.out
