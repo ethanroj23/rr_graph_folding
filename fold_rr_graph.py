@@ -102,7 +102,16 @@ if __name__ == '__main__':
         for file in os.listdir('flat_graphs'):
             graphs_to_fold.append(file[:-4])
     elif len(sys.argv) == 3:
-        graphs_to_fold.append(sys.argv[2])
+        graph_name = sys.argv[2]
+        if graph_name == '1':
+            graph_name = 'EArch_tseng'
+        elif graph_name == '2':
+            graph_name = 'k6_frac_N10_frac_chain_mem32K_40nm_arm_core'
+        elif graph_name == '3':
+            graph_name = 'stratixiv_cholesky'
+        elif graph_name == '4':
+            graph_name = 'directrf'
+        graphs_to_fold.append(graph_name)
     
     # Dynamically import the folding module based on the input argument
     folding_method = sys.argv[1]

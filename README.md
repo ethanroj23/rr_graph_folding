@@ -34,12 +34,16 @@ python fold_rr_graph.py <folding_method> <flat_graph_name>
 # Working Example
 
 - Branches for each folding method follow the naming convention that the git branch name is the same as the folding method name.
-- A working example of the `nodes_all_attr` folding method can be found on the nodes_all_attr branch. (add link...)
+- A working example of the `nodes_all_attr` folding method can be found on the [nodes_all_attr](https://github.com/ethanroj23/vtr-verilog-to-routing/tree/nodes_all_attr) branch
 - To run this example, simply checkout the branch, build VTR and then run the following command
 ```
-This is the command...
+    $VTR_ROOT/vtr_flow/arch/timing/EArch.xml \
+    $VTR_ROOT/vtr_flow/benchmarks/blif/tseng.blif \
+    --route_chan_width 100 --read_rr_graph path/to/folded_graphs/nodes_all_attr_EArch_tseng.xml
 ```
-- To compare with the flat graph, checkout this (add link...) branch, build VTR and then run the following command
+- To compare with the flat graph, checkout [this](https://github.com/ethanroj23/vtr-verilog-to-routing/tree/vtr_master) branch, build VTR and then run the following command
 ```
-This is the command...
+$VTR_ROOT/vtr_flow/arch/timing/EArch.xml \
+    $VTR_ROOT/vtr_flow/benchmarks/blif/tseng.blif \
+    --route_chan_width 100 --read_rr_graph path/to/flat_graphs/EArch_tseng.xml
 ```
