@@ -205,14 +205,7 @@ def save(graph, graph_name):
                 write_line = line
                 # everything until rr_edges remains the same as before
                 if '<rr_edges' in line:
-                    folded_file.write(f'<rr_node_e_ptns>\n')
-                    for i, node in enumerate(graph[F_NODE_TO_PTN]):
-                        if len(node):
-                            folded_file.write(f'<node_e_ptn id="{i}" dest="{graph[F_FIRST_DEST][i]}">\n')
-                            for ptn in node:
-                                folded_file.write(f'<e_ptn id="{ptn}"/>\n')
-                            folded_file.write(f'</node_e_ptn>\n')
-                    folded_file.write(f'</rr_node_e_ptns>\n')
+
                     folded_file.write(f'<rr_edge_ptns>\n')
                     ptn_idx = 0
                     for key in graph[F_EDGE_PTN]:
@@ -223,6 +216,17 @@ def save(graph, graph_name):
                         folded_file.write(f'</edge_ptn>\n')
                         ptn_idx += 1
                     folded_file.write(f'</rr_edge_ptns>\n')
+
+
+                    folded_file.write(f'<rr_node_e_ptns>\n')
+                    for i, node in enumerate(graph[F_NODE_TO_PTN]):
+                        if len(node):
+                            folded_file.write(f'<node_e_ptn id="{i}" dest="{graph[F_FIRST_DEST][i]}">\n')
+                            for ptn in node:
+                                folded_file.write(f'<e_ptn id="{ptn}"/>\n')
+                            folded_file.write(f'</node_e_ptn>\n')
+                    folded_file.write(f'</rr_node_e_ptns>\n')
+
                     folded_file.write(f'</rr_graph>\n')
                     return
                 folded_file.write(write_line)

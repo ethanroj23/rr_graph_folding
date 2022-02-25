@@ -3,8 +3,10 @@
 # 2. checks if folded graphs exist in rr_graph_folding/folded_graphs/
 # 3. runs regression
 
-export FOLDING_METHOD=switches_subsets
+
+export FOLDING_METHOD=$1
 export RRGF_DIR=/home/ethan/workspaces/ethanroj23/rr_graph_folding
+export VTR_ROOT=/home/ethan/workspaces/ethanroj23/vtr
 
 # month date hour minute
 now=$(date +"%m_%d_%H_%M")
@@ -25,27 +27,32 @@ export perf_options="sudo perf stat -B -e cache-references,cache-misses,L1-dcach
 
 # EArch tseng
 echo "EArch tseng..."
+CUR_FILE="${RRGF_DIR}/folded_graphs/${FOLDING_METHOD}_EArch_tseng.xml"
 cd ~/vtr_work/quickstart/vpr_tseng
 $perf_options --output perf.out \
 $VTR_ROOT/vpr/vpr $VTR_ROOT/vtr_flow/arch/timing/EArch.xml $VTR_ROOT/vtr_flow/benchmarks/blif/tseng.blif \
 --route_chan_width 100 --read_rr_graph \
-$RRGF_DIR/folded_graphs/switches_subsets_EArch_tseng.xml \
+$CUR_FILE \
 > $CUR_DIR/EArch_tseng.log
 cp perf.out $CUR_DIR/EArch_tseng_perf.out
 
 # k6 arm_core
 echo "k6_arm_core..."
+CUR_FILE="${RRGF_DIR}/folded_graphs/${FOLDING_METHOD}_k6_frac_N10_frac_chain_mem32K_40nm_arm_core.xml"
 
 cd $VTR_ROOT/vtr_flow/tasks/regression_tests/vtr_reg_nightly_test3/vtr_reg_qor_chain/run001/k6_frac_N10_frac_chain_mem32K_40nm.xml/arm_core.v/common
 $perf_options --output perf.out \
 $VTR_ROOT/vpr/vpr k6_frac_N10_frac_chain_mem32K_40nm.xml arm_core \
 --circuit_file arm_core.pre-vpr.blif \
 --route_chan_width 120 --read_rr_graph \
-$RRGF_DIR/folded_graphs/switches_subsets_k6_frac_N10_frac_chain_mem32K_40nm_arm_core.xml \
+$CUR_FILE \
 > $CUR_DIR/k6_arm_core.log 
 cp perf.out $CUR_DIR/k6_arm_core_perf.out
 
 # stratixiv cholesky
+echo "stratixiv_cholesky..."
+CUR_FILE="${RRGF_DIR}/folded_graphs/${FOLDING_METHOD}_stratixiv_cholesky.xml"
+
 cd $VTR_ROOT/vtr_flow/tasks/regression_tests/vtr_reg_weekly/vtr_reg_titan/run003/stratixiv_arch.timing.xml/cholesky_mc_stratixiv_arch_timing.blif/common
 $perf_options --output perf.out \
 $VTR_ROOT/vpr/vpr stratixiv_arch.timing.xml \
@@ -55,7 +62,7 @@ $VTR_ROOT/vpr/vpr stratixiv_arch.timing.xml \
    --route_chan_width 300 \
    --max_router_iterations 400 \
    --router_lookahead map \
-   --read_rr_graph $RRGF_DIR/folded_graphs/switches_subsets_stratixiv_cholesky.xml \
+   --read_rr_graph $CUR_FILE \
    >> $CUR_DIR/stratixiv_cholesky.log
 cp perf.out $CUR_DIR/stratixiv_cholesky_perf.out
 
