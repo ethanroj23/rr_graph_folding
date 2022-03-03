@@ -19,18 +19,23 @@ vtr_runs = {'vtr1': VTR1_DIR,
             }
 
 
-def parse_results(cwd, write_file=False):
+'''
+For a given directory, obtain results for all runs inside it
+'''
+def parse_results(cwd, write_file=False, printing=False):
     valid_runs = []
     stats = {}
     vtr_runs = []
     for file in os.listdir(cwd):
         if '.log' in file:
             vtr_runs.append(file.replace('.log', ''))
-            print(file)
+            if printing:
+                print(file)
 
 
     for run in vtr_runs:
-        print(run)
+        if printing:
+            print(run)
         stats[run] = {}
         fname = cwd+'/'+ run +'.log'
         if os.path.isfile(fname) :
@@ -60,6 +65,12 @@ def parse_results(cwd, write_file=False):
                         elif 'Placement' in line:
                             value = float(re.findall('took ([0-9]+\.[0-9]+)', line)[0])
                             stats[run]['placement'] = value
+                        elif 'Loading routing resource graph' in line:
+                            value = float(re.findall('delta_rss \+([0-9]+\.[0-9]+)', line)[0])
+                            stats[run]['rr_graph delta_rss'] = value
+
+                        ## Loading routing resource graph took 0.07 seconds (max_rss 48.1 MiB, delta_rss +12.7 MiB)
+
                     elif 'edges represented out of' in line:
                         edge_patterns = int(re.findall('([0-9]+) edges', line)[0])
                         total_bytes += edge_patterns*8
@@ -68,7 +79,8 @@ def parse_results(cwd, write_file=False):
                     elif 'RR Graph Nodes, Edges, Chan Width' in line:
                         nodes = int(re.findall('([0-9]+), ([0-9]+)', line)[0][0])
                         # edges = int(re.findall('([0-9]+), ([0-9]+)', line)[0][1])
-                        print('nodes: ', nodes)
+                        if printing:
+                            print('nodes: ', nodes)
                         stats[run]['nodes'] = nodes
                         if isfolded:
                             stats[run]['edges'] = edge_patterns
@@ -95,55 +107,54 @@ def parse_results(cwd, write_file=False):
                         
 
     # iterate over cache misses and obtain useful information
+
+    using_perf = False
+
     for run in vtr_runs:
-        with open(cwd+'/'+ run +'_perf.out', 'r') as file:
-            line_count = 0
-            for line in file:
-                line_count +=1
-                if 'of all' in line:
-                    miss_rate = re.findall('([0-9]+\.[0-9]+[ ]*%) of all', line)[0]
-                    miss_rate = float(miss_rate.replace(' ', '').replace('%', ''))
-                    miss_type = re.findall('of all ([\w-]+ \w+)', line)[0]
-                    stats[run][miss_type] = miss_rate
-                    # print(line, end='')
-            if line_count!=0:
-                valid_runs.append(run)            
+        if using_perf:
+            with open(cwd+'/'+ run +'_perf.out', 'r') as file:
+                line_count = 0
+                for line in file:
+                    line_count +=1
+                    if 'of all' in line:
+                        miss_rate = re.findall('([0-9]+\.[0-9]+[ ]*%) of all', line)[0]
+                        miss_rate = float(miss_rate.replace(' ', '').replace('%', ''))
+                        miss_type = re.findall('of all ([\w-]+ \w+)', line)[0]
+                        stats[run][miss_type] = miss_rate
+                        # print(line, end='')
+                if line_count!=0:
+                    valid_runs.append(run)     
+        else:
+            valid_runs.append(run)       
             
 
 
     out = f'# Results for {cwd.split("/")[-1]}\n'
     miss_types = ['vtr', 'cache refs', 'L1-dcache accesses', 'LL-cache accesses', 'routing', 'lookahead',
-     'packing', 'placement', 'max_rss','entire flow', 'nodes', 'edges', 'size']
-    # print()
-    # print('| category '.ljust(21)+'|  ', end='')
+     'packing', 'placement', 'max_rss','entire flow', 'nodes', 'edges', 'rr_graph delta_rss']
     out += '| category '.ljust(21)+'|  '
     for miss_type in miss_types:
         if miss_type=='vtr':
-                # print('  |  '.join(valid_runs), end='')
                 out += '  |  '.join(valid_runs)
-                # print('  |')
                 out += '  |\n'
-                # print('|'+'-'*20+('|'+'-'*8)*len(valid_runs)+'|')
                 out += '|'+'-'*20+('|'+'-'*8)*len(valid_runs)+'|\n'
         else:
-            # print(f'| {miss_type}'.ljust(21)+'|', end='')
             out += f'| {miss_type}'.ljust(21)+'|'
             for run in valid_runs:
                 if miss_type in stats[run]:
-                    # print(f'{stats[run][miss_type]}'.ljust(8)+'|', end='')
                     if miss_type=='size':
                         out += f'{stats[run][miss_type]:.2f}'.ljust(8)+'|'
                     else:
                         out += f'{stats[run][miss_type]}'.ljust(8)+'|'
                 else:
-                    # print(''.ljust(8)+'|', end='')
                     out += ''.ljust(8)+'|'
 
             out += '\n'
 
 
-    print()
-    print(out)
+    if printing:
+        print()
+        print(out)
     if write_file:
         with open(cwd+'/reg_results.md', 'w') as file:
             file.write(out)
@@ -152,11 +163,22 @@ def parse_results(cwd, write_file=False):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 1:
         print('Please include the directory you would like to parse...')
         exit()
+
     cur_dir = sys.argv[1]
-    cur_stats = parse_results(cur_dir, True)
+
+    if len(sys.argv) > 2: # parse each subdirectory
+        print("trying")
+        for subdirectory in os.listdir(cur_dir):
+            print(subdirectory)
+            cur = f'{cur_dir}/{subdirectory}'
+            if os.path.isdir(cur):
+                print(f"Working on {cur}")
+                parse_results(cur, True, True)
+    else:
+        cur_stats = parse_results(cur_dir, True, True)
 
 
 

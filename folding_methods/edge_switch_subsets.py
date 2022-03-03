@@ -122,6 +122,7 @@ def fold(graph):
             node_first_dest[i] = first_dest
             prev_switch = -1
             for edge in graph[EDGE][i]:
+                # dest_diff = edge[0] - first_dest
                 dest_diff = edge[0] - first_dest
                 switch = edge[1]
                 if prev_switch != switch:
