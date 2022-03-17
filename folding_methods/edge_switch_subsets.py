@@ -101,7 +101,6 @@ def fold_save_metrics(flat_graph, graph_name):
     verify(flat_graph, folded_graph)
 
 
-
 def fold(graph):
     edge_node_patterns = {}
     node_to_edges_idx = []
@@ -164,6 +163,8 @@ def fold(graph):
     print(f'\n{node_to_ptn_count} node to patterns\n{len(all_edge_patterns)} patterns\n{edge_switch_count} edge and switches [{edge_switch_count / graph[EDGE_COUNT]:.2f}]')
     print(f'Original Size: {graph[EDGE_COUNT]} edges {flat_size:.2f} MiB')
     print(f'Folded Size: {folded_size:.2f} MiB [{folded_size / flat_size:.2f}] or [{folded_size / flat_size_on_disk:.2f}] on disk')
+    print(f'# Node to ptn: {node_to_ptn_count}\n# Edge Patterns: {len(all_edge_patterns)}\n# Num edges in patterns: {edge_switch_count}')
+
 
     folded_graph = [node_to_edge_patterns, all_edge_patterns, node_first_dest]
     return folded_graph

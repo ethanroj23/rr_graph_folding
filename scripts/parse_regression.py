@@ -109,8 +109,11 @@ def parse_results(cwd, write_file=False, printing=False):
     # iterate over cache misses and obtain useful information
 
     using_perf = False
+    select_runs = False
 
     for run in vtr_runs:
+        if select_runs and run not in ['EArch_tseng', 'k6_arm_core', 'stratixiv_cholesky', 'linux_arty']:
+            continue
         if using_perf:
             with open(cwd+'/'+ run +'_perf.out', 'r') as file:
                 line_count = 0

@@ -270,6 +270,8 @@ def md_all_absolute(dirs, stats):
 
     first_dir = dirs[0]
     for device in stats[first_dir]:
+        # if device == 'directrf': # if you want to skip directrf
+        #     continue
         out += f'## Device - {device}\n'
 
         # Header with Categories line
@@ -312,7 +314,7 @@ def md_all_absolute(dirs, stats):
     return out
 
 
-def md_all_relative(dirs, stats):
+def table_all(dirs, stats, using='md', rel=False):
     ''' Generates a table like the following.
         Device - EArch_tseng
         | category |nodes_all_attr_binary_search|flat|switches_subsets|nodes_all_attr|edge_switch_subsets|
@@ -325,6 +327,17 @@ def md_all_relative(dirs, stats):
 
     methods = [x.split('/')[-1] for x in dirs]
     methods = ['_'.join(x.split('_')[:-4]) for x in methods]
+    methods.remove('flat')
+    methods.append('flat')
+    for i in range(len(dirs)):
+        if 'flat' in dirs[i]:
+            flat_dir = dirs[i]
+            del dirs[i]
+            dirs.append(flat_dir)
+            break
+
+
+
     print('\n---compare\n')
     out = f'### Comparisons for '
     for cur_dir in dirs:
@@ -343,19 +356,29 @@ def md_all_relative(dirs, stats):
         if 'flat' in cur_dir:
             flat_dir = cur_dir
     for device in stats[first_dir]:
-        out += f'## Device - {device}\n'
+        # if device == 'directrf': # if you want to skip directrf
+        #     continue
+        out += f'\n## Device - {device}\n\n'
 
-        # Header with Categories line
-        out += '| category '
-        for method in methods:
-            out += f'|{method}'
-        out += '|\n'
+        if using=='md':
+            # Header with Categories line
+            out += '| category '
+            for method in methods:
+                out += f'|{method}'
+            out += '|\n'
 
-        # Hyphens line
-        for method in methods:
-            out += f'|---'
-        out += '|---|\n'
+            # Hyphens line
+            for method in methods:
+                out += f'|---'
+            out += '|---|\n'
+        
+        if using=='latex':
+            out += '\\begin{table}[H]\n' + \
+            '\\centering\n' + \
+            '\\begin{tabular}{|'+'|'.join(['l']*(len(methods)+1))+'|}\n' + r'\hline'+'\n' + \
+            'Category & ' + ' & '.join(methods) + r' \\\hline' + '\n'
 
+        md = using=='md'
         
         for attr in attribute_order: # use stats[first_dir][device]: if you don't want to predefine the attributes
             if attr=='vtr':
@@ -363,7 +386,7 @@ def md_all_relative(dirs, stats):
                     out += '  |\n'
                     out += '|'+'-'*20+('|'+'-'*8)*len(dirs)+'|\n'
             else:
-                out += f'| {attr}'.ljust(21)+'|' # category
+                out += f'| {attr}'.ljust(21)+'|' if md else f'{attr}'.ljust(21)+' &'    # category
                 minimum = None
                 if attr in stats[first_dir][device]:
                     minimum = min([stats[x][device][attr] for x in dirs])
@@ -373,24 +396,38 @@ def md_all_relative(dirs, stats):
                     if attr in cur_stats:
                         cur_val = stats[cur_dir][device][attr]
                         flat_val = stats[flat_dir][device][attr]
-                        perc = 0
+                        perc = 0                             
+
                         if flat_val != 0:
                             perc = (cur_val - flat_val)/flat_val*100
-                        if cur_val == minimum:
-                            out += f' `{perc:.2f}%`'.ljust(8)+'|' # data
+                        value = f'{perc:.2f}%' if rel else f'{cur_stats[attr]:.2f}'
+                        if cur_val == minimum and md:
+                            out += f' `{value}`'.ljust(8)+'|' # data
                         else:
-                            out += f' {perc:.2f}%'.ljust(8)+'|' # data
+                            out += f' {value}'.ljust(8)+'|' if md else f' {value}'.ljust(8)+' &'# data
                     else:
-                        out += ''.ljust(8)+'|'
+                        out += ''.ljust(8)+'|' if md else ''.ljust(8)+' &'
 
-                out += '\n'
+                if md:
+                    out += '\n'
+                else:
+                    out = out[:-1]
+                    out += ' \\\\ \n'
 
+        if not md:
+            out += '\hline\n\end{tabular}\n'
+            out += '\caption{\label{tab:with_without_api} Percent increase in runtime with addition of API.}\n'
+            out += '\end{table}'
+    if not md:
+        out = out.replace('_', '\_')
+        out = out.replace('%', '\%')
 
     print()
     print(out)
     return out
     
-    
+
+
 
 
 
@@ -425,20 +462,31 @@ def compare_all():
         stats[cur_dir] = parse_results(cur_dir)
 
 
-    for cur_dir in dirs:
-        print(cur_dir)
-        print(stats[cur_dir])
+    # for cur_dir in dirs:
+    #     print(cur_dir)
+    #     print(stats[cur_dir])
 
-    for device in stats[first_dir]:
-        print(device)
-        for attr in stats[first_dir][device]:
-            print(f'{attr}')
-            for cur_dir in dirs:
-                print(f' {stats[cur_dir][device][attr]}')
+    # for device in stats[first_dir]:
+    #     print(device)
+    #     for attr in stats[first_dir][device]:
+    #         print(f'{attr}')
+    #         for cur_dir in dirs:
+    #             print(f' {stats[cur_dir][device][attr]}')
 
 
-    absolute = md_all_absolute(dirs, stats)
-    relative = md_all_relative(dirs, stats)
+    relative = '' # so that the temp_comparison.md file can always be written
+    absolute = ''
+
+    method = 'latex'
+    if len(sys.argv) >= 4:
+        method = sys.argv[3]
+
+    if len(sys.argv) >= 5:
+        relative = table_all(dirs, stats, method, True) # relative
+        absolute = table_all(dirs, stats, method, False) # absolute
+    else:
+        absolute = table_all(dirs, stats, method, False) # absolute
+        relative = table_all(dirs, stats, method, True) # relative
 
 
     with open('temp_comparison.md', 'w') as file:

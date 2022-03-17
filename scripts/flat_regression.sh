@@ -30,6 +30,22 @@ echo "To kill process run the following command:"
 echo "kill -9 $$"
 echo $$ > $CUR_DIR/current_pid.out
 
+directrf
+echo "directrf..."
+
+cd $VTR_ROOT/vtr_flow/tasks/regression_tests/titan/directrf
+$perf_options --output perf.out \
+$VTR_ROOT/vpr/vpr $VTR_ROOT/vtr_flow/arch/titan/stratixiv_arch.timing.xml \
+   $VTR_ROOT/vtr_flow/benchmarks/titan_blif/directrf_stratixiv_arch_timing.blif \
+   --sdc_file $VTR_ROOT/vtr_flow/benchmarks/titan_blif/directrf_stratixiv_arch_timing.sdc \
+   --route_chan_width 300  \
+   --read_rr_graph $RRGF_DIR/flat_graphs/directrf.xml \
+   >> $CUR_DIR/directrf.log
+cp perf.out $CUR_DIR/directrf_perf.out
+
+python3 $SCRIPTS_DIR/parse_regression.py $CUR_DIR > reg_results.md
+rm $CUR_DIR/current_pid.out
+exit 1
 
 export X50_RRGRAPH=/home/ethan/opt/symbiflow/xc7/install/share/symbiflow/arch/xc7a50t_test/rr_graph_xc7a50t_test.rr_graph.real.bin
 export X100_RRGRAPH=/home/ethan/opt/symbiflow/xc7/install/share/symbiflow/arch/xc7a100t_test/rr_graph_xc7a100t_test.rr_graph.real.bin
@@ -52,19 +68,22 @@ export VTR_ROOT=/home/ethan/workspaces/ethanroj23/vtr
 export perf_options="sudo perf stat -B -e cache-references,cache-misses,L1-dcache-loads,L1-dcache-load-misses,L1-dcache-stores,LLC-loads,LLC-load-misses,LLC-stores"
 
 export SYM_ARCH=$VTR_ROOT/vtr_flow/arch/symbiflow
+export SYM_BLIF=$VTR_ROOT/vtr_flow/benchmarks/symbiflow
+export CUR_DEVICE=xc7a50t_test
 
 for SYM_DIR in linux_arty picosoc_basys3_full_50 picosoc_basys3_full_100 minilitex_arty
+# for SYM_DIR in linux_arty_100t
 do
    if [ ! -d $RRGF_DIR/temp_runs/$SYM_DIR ]; then
       mkdir $RRGF_DIR/temp_runs/$SYM_DIR
    fi
    cd $RRGF_DIR/temp_runs/$SYM_DIR
+   
 
    echo "${SYM_DIR}"
-   cd /home/ethan/workspaces/ethanroj23/vtr/vtr_flow/tasks/regression_tests/vtr_reg_nightly_test1/symbiflow/run002/arch.timing.xml/$SYM_DIR.eblif/common/
    $perf_options --output perf.out \
-   $VTR_ROOT/vpr/vpr arch.timing.xml $SYM_DIR --circuit_file $SYM_DIR.pre-vpr.eblif \
-   --read_rr_graph $SYM_ARCH/rr_graph_xc7a50t_test.rr_graph.real.bin --read_router_lookahead $SYM_ARCH/rr_graph_xc7a50t_test.lookahead.bin --read_placement_delay_lookup $SYM_ARCH/rr_graph_xc7a50t_test.place_delay.bin --max_router_iterations 500 --routing_failure_predictor off --router_high_fanout_threshold 1000 --constant_net_method route --route_chan_width 500 --router_heap bucket --clock_modeling route --place_delta_delay_matrix_calculation_method dijkstra --place_delay_model delta_override --router_lookahead extended_map --check_route quick --strict_checks off --allow_dangling_combinational_nodes on --disable_errors check_unbuffered_edges:check_route --congested_routing_iteration_threshold 0.8 --incremental_reroute_delay_ripup off --base_cost_type delay_normalized_length_bounded --bb_factor 10 --initial_pres_fac 4.0 --check_rr_graph off \
+   $VTR_ROOT/vpr/vpr $SYM_ARCH/$CUR_DEVICE/arch.timing.xml $SYM_BLIF/$SYM_DIR.eblif \
+   --read_rr_graph $RRGF_DIR/flat_graphs/xc7a50t_test.xml --read_router_lookahead $SYM_ARCH/$CUR_DEVICE/rr_graph_$CUR_DEVICE.lookahead.bin --read_placement_delay_lookup $SYM_ARCH/$CUR_DEVICE/rr_graph_$CUR_DEVICE.place_delay.bin --max_router_iterations 500 --routing_failure_predictor off --router_high_fanout_threshold 1000 --constant_net_method route --route_chan_width 500 --router_heap bucket --clock_modeling route --place_delta_delay_matrix_calculation_method dijkstra --place_delay_model delta_override --router_lookahead extended_map --check_route quick --strict_checks off --allow_dangling_combinational_nodes on --disable_errors check_unbuffered_edges:check_route --congested_routing_iteration_threshold 0.8 --incremental_reroute_delay_ripup off --base_cost_type delay_normalized_length_bounded --bb_factor 10 --initial_pres_fac 4.0 --check_rr_graph off \
    --fix_clusters /home/ethan/workspaces/ethanroj23/vtr/vtr_flow/benchmarks/symbiflow/place_constr/$SYM_DIR.place \
    --sdc_file /home/ethan/workspaces/ethanroj23/vtr/vtr_flow/benchmarks/symbiflow/sdc/$SYM_DIR.sdc \
    > $CUR_DIR/$SYM_DIR.log
@@ -87,9 +106,9 @@ cp perf.out $CUR_DIR/EArch_tseng_perf.out
 # k6 arm_core
 echo "k6_arm_core..."
 
-cd $VTR_ROOT/vtr_flow/tasks/regression_tests/vtr_reg_nightly_test3/vtr_reg_qor_chain/run001/k6_frac_N10_frac_chain_mem32K_40nm.xml/arm_core.v/common
+cd $RRGF_DIR/temp_runs/k6_arm_core
 $perf_options --output perf.out \
-$VTR_ROOT/vpr/vpr k6_frac_N10_frac_chain_mem32K_40nm.xml arm_core \
+$VTR_ROOT/vpr/vpr $VTR_ROOT/vtr_flow/arch/timing/k6_frac_N10_frac_chain_mem32K_40nm.xml arm_core \
 --circuit_file arm_core.pre-vpr.blif \
 --route_chan_width 120 --read_rr_graph \
 $RRGF_DIR/flat_graphs/k6_frac_N10_frac_chain_mem32K_40nm_arm_core.xml \
@@ -112,17 +131,18 @@ $VTR_ROOT/vpr/vpr stratixiv_arch.timing.xml \
    >> $CUR_DIR/stratixiv_cholesky.log
 cp perf.out $CUR_DIR/stratixiv_cholesky_perf.out
 
-echo "directrf..."
+# directrf
+# echo "directrf..."
 
-cd $VTR_ROOT/vtr_flow/tasks/regression_tests/titan/directrf
-$perf_options --output perf.out \
-$VTR_ROOT/vpr/vpr $VTR_ROOT/vtr_flow/arch/titan/stratixiv_arch.timing.xml \
-   $VTR_ROOT/vtr_flow/benchmarks/titan_blif/directrf_stratixiv_arch_timing.blif \
-   --sdc_file $VTR_ROOT/vtr_flow/benchmarks/titan_blif/directrf_stratixiv_arch_timing.sdc \
-   --route_chan_width 300  \
-   --read_rr_graph $RRGF_DIR/flat_graphs/directrf.xml \
-   >> $CUR_DIR/directrf.log
-cp perf.out $CUR_DIR/directrf_perf.out
+# cd $VTR_ROOT/vtr_flow/tasks/regression_tests/titan/directrf
+# $perf_options --output perf.out \
+# $VTR_ROOT/vpr/vpr $VTR_ROOT/vtr_flow/arch/titan/stratixiv_arch.timing.xml \
+#    $VTR_ROOT/vtr_flow/benchmarks/titan_blif/directrf_stratixiv_arch_timing.blif \
+#    --sdc_file $VTR_ROOT/vtr_flow/benchmarks/titan_blif/directrf_stratixiv_arch_timing.sdc \
+#    --route_chan_width 300  \
+#    --read_rr_graph $RRGF_DIR/flat_graphs/directrf.xml \
+#    >> $CUR_DIR/directrf.log
+# cp perf.out $CUR_DIR/directrf_perf.out
 
 
 
