@@ -64,8 +64,6 @@ $VTR_ROOT/vtr_flow/arch/timing/EArch.xml \
 
 
 # Quick Overview of Results
-![all_graphs](https://user-images.githubusercontent.com/55202333/159975726-259851dd-b678-4c67-8481-bc6979656982.PNG)
-
-
+![all_graphs](https://user-images.githubusercontent.com/55202333/159982459-1922d5d0-a102-4abc-a8ea-ee5bc5f05c1b.PNG)
 
 
