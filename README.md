@@ -47,3 +47,25 @@ $VTR_ROOT/vtr_flow/arch/timing/EArch.xml \
     $VTR_ROOT/vtr_flow/benchmarks/blif/tseng.blif \
     --route_chan_width 100 --read_rr_graph path/to/flat_graphs/EArch_tseng.xml
 ```
+
+# Visual Representation of Folding Methods
+
+## Flat Representation
+![flat_concrete](https://user-images.githubusercontent.com/55202333/159975585-7768ac93-fdec-44eb-91a4-9c9d8df89ac0.png)
+
+## Nodes All Attributes Folding Method
+![nodes_all_attr_concrete](https://user-images.githubusercontent.com/55202333/159975602-4252a590-1fd0-40b8-b381-8a615bbd4045.png)
+
+## Switches Subsets Folding Method
+![switches_subsets_concrete](https://user-images.githubusercontent.com/55202333/159975624-c8838cec-c209-4b28-84d3-3233a790a9f5.png)
+
+## Dest Switch Subsets Folding Method
+![dest_switch_subsets](https://user-images.githubusercontent.com/55202333/159975638-b848192f-7b7f-4e9f-8891-2a2c4319cad9.png)
+
+
+# Quick Overview of Results
+![all_graphs](https://user-images.githubusercontent.com/55202333/159975726-259851dd-b678-4c67-8481-bc6979656982.PNG)
+
+
+
+
