@@ -167,3 +167,22 @@
 | rr_graph delta_rss | -1.09% | 8.77%  | -1.16% | `-13.67%`| 0.00%  |
 | max_rss            | -0.91% | 7.29%  | -0.96% | `-11.37%`| 0.00%  |
 | entire flow        | 116.58%| `-0.77%`| 3.74%  | 9.42%  | 0.00%  |
+
+# Tables with updated results
+
+## nodes_all_attr results for several benchmarks
+![nodes_all_attr](https://user-images.githubusercontent.com/55202333/159975133-dc5718ed-17a7-4821-925c-6dc30fa7fc2b.PNG)
+
+## switches_subsets results for several benchmarks
+![switches_subsets](https://user-images.githubusercontent.com/55202333/159975083-a943647c-a40b-4cf2-90b4-692fbc8622f9.PNG)
+
+## dest_switch_subsets results for several benchmarks
+![dest_switch_subsets](https://user-images.githubusercontent.com/55202333/159974161-ce0c6642-73e0-48b6-8095-2216fa4b3390.PNG)
+
+## nodes_edges results for several benchmarks
+![nodes_edges](https://user-images.githubusercontent.com/55202333/159974983-f2ff8b21-2553-41ba-9929-0f492f85de54.PNG)
+
+## F4PGA Folded Devices Sizes
+![f4pga_sizes](https://user-images.githubusercontent.com/55202333/159974973-1650538d-2e23-45f2-b452-654b46ed1696.PNG)
+
+
